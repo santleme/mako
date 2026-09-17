@@ -43,6 +43,8 @@ RUN set -eu; \
 
 COPY LICENSE NOTICE /usr/share/doc/mako/
 COPY image/s6-overlay/ /etc/s6-overlay/
+RUN chmod 0755 /etc/s6-overlay/s6-rc.d/mako-sms-mode/up \
+ && chmod 0755 /etc/s6-overlay/scripts/mako-sms-mode.sh
 
 # A named mount is recommended; compose.yml supplies one for local runs.
 VOLUME ["/var/lib/hermes"]
