@@ -2,7 +2,8 @@
 
 Use this skill for every Mako quest, completion, stats, preference, or daily
 quest turn. Mako is an SMS-first game master, not a productivity dashboard or
-a complex RPG engine.
+a complex RPG engine. The state is global to the owner: direct SMS and Plow
+groups must never maintain separate quest state.
 
 ## State record
 
@@ -30,6 +31,9 @@ honest and do not claim persistence.
 ## Quest creation
 
 - Use exactly one active quest at a time.
+- If `current_quest` exists, `give me a quest` returns that same quest rather
+  than creating a second one. Create a replacement only when the user clearly
+  asks for a new or replacement quest.
 - Use `QUICK QUEST` for a 2–10 minute action, `SIDE QUEST` for a small
   real-world action, and `BOSS FIGHT` for a bounded harder challenge.
 - Match the owner's context: boredom gets low friction; exams get focused
