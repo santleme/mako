@@ -7,6 +7,25 @@ if [ -f /run/s6/container_environment/MAKO_SMS_ONLY ]; then
 fi
 
 if [ "$sms_only" != "true" ]; then
+  # Re-enable the official relay if an operator opts back in after a previous
+  # SMS-only boot. plow-init has already restored/exported its URL by this
+  # point; keep the config and environment in agreement.
+  /opt/hermes/.venv/bin/python3 - <<'PY'
+from pathlib import Path
+import os
+import yaml
+
+config_path = Path("/var/lib/hermes/config.yaml")
+if config_path.exists():
+    config = yaml.safe_load(config_path.read_text()) or {}
+    server = config.get("mcp_servers", {}).get("plow")
+    if isinstance(server, dict):
+        server["enabled"] = True
+        temporary = config_path.with_suffix(".yaml.mako-tmp")
+        temporary.write_text(yaml.safe_dump(config, sort_keys=False))
+        os.chmod(temporary, 0o640)
+        os.replace(temporary, config_path)
+PY
   exit 0
 fi
 
