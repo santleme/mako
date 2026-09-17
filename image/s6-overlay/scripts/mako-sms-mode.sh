@@ -19,6 +19,14 @@ fi
 # MAKO_SMS_ONLY is changed to false.
 rm -f /run/s6/container_environment/PLOW_MCP_URL
 
+# The one-time registration command may have been run as root on an older
+# checkout. The reporter deliberately drops to the hermes user, so repair only
+# its private state file before that longrun starts; never chown the RPG state
+# or the whole persistent home.
+if [ -e /var/lib/hermes/.agent-index-state.json ]; then
+  chown hermes:hermes /var/lib/hermes/.agent-index-state.json
+fi
+
 /opt/hermes/.venv/bin/python3 - <<'PY'
 import os
 from pathlib import Path

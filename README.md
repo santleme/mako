@@ -45,6 +45,18 @@ docker compose up --build -d
 docker compose logs -f agent
 ```
 
+For a fresh checkout, the official one-command local path is equivalent:
+
+```sh
+plow-agents deploy --local --line <mako-line-uid>
+docker compose ps
+docker compose logs -f agent
+```
+
+`deploy --local` mints the line-scoped credential and starts this Compose
+project. Use `mint` plus `docker compose up` when the credential already exists
+or when you want to inspect each step separately.
+
 The named `mako-home` volume persists Hermes state and
 `/var/lib/hermes/.agent-index.json`, which preserves this install's Agent Index
 identity across container recreation. Do not use a fresh anonymous volume for a
@@ -62,7 +74,7 @@ docker compose run --rm --no-deps --build --user 10000:10000 \
   '/opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py --self-check && \
    /opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py --register \
      --agent mako --name "Mako" \
-     --blurb "Mako turns real life into an RPG with text quests, photo proof, and persistent progression." \
+     --blurb "Mako turns your real life into an RPG: text quests, persistent XP, co-op progress, and photo proof." \
      --repo "https://github.com/santleme/mako" --runtime "Hermes / Plow" \
      --install-url "https://github.com/santleme/mako#agent-index-install-flow" && \
    /opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py status'
@@ -71,11 +83,12 @@ docker compose exec -T agent /opt/hermes/.venv/bin/python3 \
   /opt/plow/agent-index-client.py --agent mako --dry-run
 ```
 
-### Agent Index install flow
+### Agent Index install flow and verification
 
-The Agent Index's `Deploy this agent locally` control currently opens the
-install instructions for this repository; it is not a hosted one-click deploy.
-The shortest supported path is:
+The current Mako record is community-listed, not cloud-deployable: the Agent
+Index has not enabled its hosted `deployable_at` flag for this agent. Its
+one-command local path is still available to anyone with Docker and a Plow
+line. The shortest supported path is:
 
 ```sh
 git clone https://github.com/santleme/mako.git
@@ -87,8 +100,18 @@ docker compose logs -f agent
 ```
 
 Look for `plow-init: configured ... as cht_...` before sending the first SMS.
-The public registration points here so the same instructions are visible from
-the Agent Index page.
+Verify the local runtime with `docker compose ps`, then verify the Agent Index
+registration from this checkout:
+
+```sh
+python3 agent_index_client.py status
+```
+
+The command must exit `0`. The public record is
+`https://aiworthusing.com/agent-index/mako`; the displayed name, blurb and
+repository should match the registration above. A hosted “Text this agent”
+button only appears after the Index maintainers enable the agent's deployable
+flag; that cannot be turned on by a repository commit.
 
 The `--user 10000:10000` registration is important: it makes the persistent
 Agent Index state readable and writable by the s6 reporter, while the normal
