@@ -22,7 +22,9 @@ The first message is useful without onboarding. Mako creates short, realistic
 quick quests, side quests and boss fights for boredom, exams, social
 situations, and everyday challenges, then tracks XP, level, Social, Knowledge,
 Fitness, Courage, Chaos, completions, streaks, achievements and lightweight
-preferences. The state is stored in
+preferences. It can show the owner's progression, run an explicit opt-in
+co-op scoreboard for a companion, and inspect a texted photo as evidence before
+the owner confirms a quest clear. The state is stored in
 `/var/lib/hermes/memories/mako-state.md` inside the named `mako-home` volume.
 An optional daily quest is opt-in through SMS and uses the official Hermes cron
 tool. The Mako logo can be sent in the same Plow Chat thread when requested.
@@ -60,13 +62,33 @@ docker compose run --rm --no-deps --build --user 10000:10000 \
   '/opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py --self-check && \
    /opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py --register \
      --agent mako --name "Mako" \
-     --blurb "Mako turns your real life into an RPG, entirely through text messages." \
-     --repo "https://github.com/santleme/mako" --runtime "Hermes / Plow" && \
+     --blurb "Mako turns real life into an RPG with text quests, photo proof, and persistent progression." \
+     --repo "https://github.com/santleme/mako" --runtime "Hermes / Plow" \
+     --install-url "https://github.com/santleme/mako#agent-index-install-flow" && \
    /opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py status'
 docker compose up --build -d
 docker compose exec -T agent /opt/hermes/.venv/bin/python3 \
   /opt/plow/agent-index-client.py --agent mako --dry-run
 ```
+
+### Agent Index install flow
+
+The Agent Index's `Deploy this agent locally` control currently opens the
+install instructions for this repository; it is not a hosted one-click deploy.
+The shortest supported path is:
+
+```sh
+git clone https://github.com/santleme/mako.git
+cd mako
+export PATH="$PWD/../plow-agents/bin:$PATH"
+plow-agents mint <mako-line-uid> --credential-file ./plow-credentials
+docker compose up --build -d
+docker compose logs -f agent
+```
+
+Look for `plow-init: configured ... as cht_...` before sending the first SMS.
+The public registration points here so the same instructions are visible from
+the Agent Index page.
 
 The `--user 10000:10000` registration is important: it makes the persistent
 Agent Index state readable and writable by the s6 reporter, while the normal

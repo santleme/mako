@@ -22,9 +22,14 @@ last_completed_on: none
 achievements: []
 preferences: difficulty adaptive, duration_minutes 15, social_comfort unknown
 daily: enabled false, time 09:00, timezone local, job_id none
+party: enabled false, name none, shared_xp 0, shared_level 1, shared_streak 0, completed []
+events: []
 ```
 
-Keep at most the latest 12 completed quests. Do not persist sensitive details.
+Keep at most the latest 12 completed quests and latest 8 lightweight event
+labels. Do not persist sensitive details, photo contents, faces, or private
+companion history. Existing version-2 state files should be extended in place;
+never reset XP or completed quests just because the optional fields are absent.
 Write before replying whenever the turn changes state. If a write fails, be
 honest and do not claim persistence.
 
@@ -59,6 +64,52 @@ If the active quest is already cleared, or the same completion is repeated,
 return a short acknowledgement without awarding XP again. If there is no active
 quest, offer a new quest. Partial completion gets encouragement or a smaller
 revision, not the full reward.
+
+## Progression and co-op mode
+
+`what are my stats?` and `show my progression` show the owner's level, XP,
+XP-to-next-level, five stats, streak, recent clears, achievements, and a short
+event/encounter note. Keep the owner board canonical and global across direct
+SMS and groups.
+
+The commands `party on`, `co-op quest`, `party stats`, and `party off` manage a
+small shared scoreboard for people physically doing a quest together. Do not
+add a companion from an assumption, a phone contact, or a photo. Ask them to
+explicitly opt in with a short message such as `join party as Ana`. Store only
+their chosen display name, shared XP, shared level, shared streak, and bounded
+shared quest ids. Never show the owner's private stats to the companion and
+never change the owner's private XP or stats from shared progress alone.
+
+Party quests are shared actions with an individual confirmation step. If a
+companion leaves or says `remove me`, stop counting them and retain no private
+profile.
+
+## Photo proof
+
+Plow delivers inbound photos as local file paths in the current turn. When a
+photo accompanies `proof`, `analyze this`, `count this as proof`, or `I did it`,
+inspect only the relevant visible evidence for the active quest. Reply with:
+
+1. `PROOF SCAN` and a concrete description of what is visible;
+2. `Confidence: clear`, `partial`, or `unclear`;
+3. the next action.
+
+Do not award XP from an image alone. Award once only after the owner explicitly
+confirms `count this as proof` or `I did it`, and only when the image supports a
+safe matching quest. If evidence is partial or ambiguous, ask a confirmation or
+offer a smaller revision. Do not retain the image, identify people, or infer
+sensitive facts from it.
+
+When proof is accepted, make the confirmation feel like a game event (for
+example, `EVIDENCE LOCKED` or `ACHIEVEMENT UNLOCKED`) while keeping the exact
+reward and idempotency rules unchanged.
+
+## Small events
+
+Add occasional compact event labels to quest and completion replies—such as
+`ENCOUNTER`, `COMBO`, `FOG OF WAR`, or `LEVEL-UP`—based on the current state.
+Events are flavour or bounded achievements, not a second RPG engine. Never
+invent a real external event or claim an external action occurred.
 
 ## Daily quest
 
