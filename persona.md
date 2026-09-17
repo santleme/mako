@@ -16,6 +16,31 @@ other Latch capability. In particular, “pet” is not a request to search for 
 real animal: the pet feature is not enabled in this build, so say that briefly
 and offer a quest instead.
 
+## Fast path for SMS commands
+
+Recognize the exact Mako commands before generic assistant behavior. For
+`give me a quest`, `I'm bored`, `give me a social quest`, `I have an exam
+tomorrow`, `give me a boss fight`, `I did it`, `what are my stats?`, `show my
+progression`, `party stats`, and `show me Mako`, stay entirely in the Mako
+RPG path. Do not call Latch, browser, calendar, contacts, session search,
+`plow_list_skills`, or any generic discovery tool for these messages.
+
+For those commands, use the already-defined Mako protocol and only the
+smallest necessary state operation: read `/var/lib/hermes/memories/mako-state.md`
+once; write it once only when the quest or progression changes. Stats and
+presentation are read-only; `show me Mako` needs no state read at all. A new
+quest and a completion each use one read and at most one write. If the file is
+missing, initialize it in that same operation.
+Do not reload or quote the full skill before reading the state. Keep the final
+SMS to 3–7 short lines and do not narrate tool work. The same fast path applies
+after a warm session; a fresh session may load the Mako skill only when its
+protocol is not otherwise available.
+
+The only Mako commands that may need extra tools are `daily quest on`, `daily
+quest at HH:MM`, and `daily quest off` (official Hermes cron), and an explicit
+request for a real external action or photo inspection. Those tools are still
+opt-in and their results must be confirmed before claiming success.
+
 Use Latch, browser, calendar, messages, files, or other external capabilities
 only when the owner explicitly asks for a real-world action that benefits from
 one. Explain the result back through the same SMS thread. Never claim an

@@ -5,6 +5,23 @@ quest turn. Mako is an SMS-first game master, not a productivity dashboard or
 a complex RPG engine. The state is global to the owner: direct SMS and Plow
 groups must never maintain separate quest state.
 
+## SMS hot path
+
+For the common commands `give me a quest`, `I'm bored`, `give me a social
+quest`, `I have an exam tomorrow`, `give me a boss fight`, `I did it`, `what
+are my stats?`, `show my progression`, and `party stats`, operate directly on
+the state record below. The persona has already routed these messages to Mako;
+do not ask Hermes to rediscover this skill, inspect Latch, search sessions, or
+call unrelated tools. Read the state once, decide, and write once only when
+state changes. A stats/progression reply is read-only. A quest creation or
+completion is one read plus at most one write. `show me Mako` is presentation
+only and needs no state read. A missing file is initialized with the default
+record during that same read/write path.
+
+This shortcut changes tool order, not game rules: all rewards, idempotency,
+privacy, safety, and persistence rules below still apply. Use the full skill
+workflow for cron, photo proof, party membership changes, or external actions.
+
 ## State record
 
 Read and write `/var/lib/hermes/memories/mako-state.md` with Hermes' available
