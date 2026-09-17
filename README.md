@@ -1,9 +1,9 @@
 # Mako
 
-Mako is an early, intentionally minimal Plow Hermes agent. Its product concept,
-persona details, skills, branding, and description are deliberately easy to
-replace later; the Plow runtime and Agent Index integration are the stable
-infrastructure layer.
+Mako turns real life into a lightweight RPG entirely through SMS / Plow Chat.
+It is a small Plow Hermes variant: the persona and one state skill live in this
+repository, while the official Plow runtime, chat plugin, persistent Hermes
+home, and Agent Index reporter remain the infrastructure layer.
 
 ## Current identity
 
@@ -13,8 +13,23 @@ infrastructure layer.
 - License for agent-specific files: MIT
 
 The identity is only published after registration with the official Agent Index
-client. If `mako` is unavailable, keep the display name Mako and use the
-shortest available fallback ID chosen during registration.
+client. The current intended public name is Mako; the final one-line blurb is
+chosen at registration time.
+
+## SMS-first behavior
+
+The first message is useful without onboarding. Mako creates short, realistic
+quick quests, side quests and boss fights for boredom, exams, social
+situations, and everyday challenges, then tracks XP, level, Social, Knowledge,
+Fitness, Courage, Chaos, completions, streaks, achievements and lightweight
+preferences. The state is stored in
+`/var/lib/hermes/memories/mako-state.md` inside the named `mako-home` volume.
+An optional daily quest is opt-in through SMS and uses the official Hermes cron
+tool. The Mako logo can be sent in the same Plow Chat thread when requested.
+Pets are intentionally deferred and are not part of the runtime image. There
+is no dashboard, frontend, web chat, separate database, or custom scheduler.
+Latch/browser/calendar tools are used only when a real requested quest
+benefits from them, and the result is always returned over SMS.
 
 ## Local build and run
 
@@ -45,7 +60,7 @@ docker compose run --rm --no-deps --build --user 10000:10000 \
   '/opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py --self-check && \
    /opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py --register \
      --agent mako --name "Mako" \
-     --blurb "A lightweight Plow agent for completing practical workflows end to end. Initial capabilities are intentionally minimal while its product direction is being finalized." \
+     --blurb "Mako turns your real life into an RPG, entirely through text messages." \
      --repo "https://github.com/santleme/mako" --runtime "Hermes / Plow" && \
    /opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py status'
 docker compose up --build -d
@@ -61,6 +76,13 @@ The runtime reporter is the official s6 longrun under
 `image/s6-overlay/s6-rc.d/agent-index`. It registers only when the client says
 the persistent install state is absent, gives the Plow bearer only to that
 registration exchange, and reports every five minutes without the bearer.
+
+## Mako + Vela
+
+Mako is the RPG owner. Vela is a separate Plow Hermes repository and line that
+is currently only a social presence in the shared Plow group. Vela does not
+own Mako's state, quests, XP, or cron jobs. The group roster is the only
+integration contract; there is no custom RPC or shared volume.
 
 ## Later evolution
 

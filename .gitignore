@@ -1,9 +1,9 @@
 # Plow and runtime credentials/state must never enter Git.
 /plow-credentials
+assets/pets/
 PLOW_AGENT_TOKEN
 aik_*
 .env
 .env.*
 __pycache__/
 *.py[cod]
-

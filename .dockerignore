@@ -8,4 +8,4 @@ aik_*
 .gitignore
 __pycache__/
 *.py[cod]
-
+/assets/pets/
