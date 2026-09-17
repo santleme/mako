@@ -1,7 +1,7 @@
 # Minimal Plow Hermes variant for Mako.
 # The base is immutable and already contains the runtime, Plow integration,
 # persistent Hermes home, s6-overlay, and base persona.
-FROM public.ecr.aws/e1h7x4a2/plow-cloud-agents:base-910b8e3ba8980e20faae9f37dcaca0ea9d8bd9ae@sha256:f4739b6e74309dcccd087792949fd613191db7f33d33109c78127684dcb5dd73
+FROM public.ecr.aws/e1h7x4a2/plow-cloud-agents:base-51f83158a70a383f03a4d03dbd8b6ea102cf0361@sha256:253d7ed3409effa7fa59113d93b4b79bb731d8264cdaf4cd60294924d0110a2e
 
 LABEL org.opencontainers.image.title="Mako"
 LABEL org.opencontainers.image.description="Mako turns real life into an RPG through SMS"
