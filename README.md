@@ -74,7 +74,7 @@ docker compose run --rm --no-deps --build --user 10000:10000 \
   '/opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py --self-check && \
    /opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py --register \
      --agent mako --name "Mako" \
-     --blurb "Mako turns your real life into an RPG: text quests, persistent XP, co-op progress, and photo proof." \
+     --blurb "Mako turns real life into an RPG through SMS: quick quests, persistent XP, co-op progress, and optional photo proof." \
      --repo "https://github.com/santleme/mako" --runtime "Hermes / Plow" \
      --install-url "https://github.com/santleme/mako#agent-index-install-flow" && \
    /opt/hermes/.venv/bin/python3 /opt/plow/agent-index-client.py status'
@@ -82,6 +82,25 @@ docker compose up --build -d
 docker compose exec -T agent /opt/hermes/.venv/bin/python3 \
   /opt/plow/agent-index-client.py --agent mako --dry-run
 ```
+
+### Cloud image and one-click deployment
+
+The repository publishes a linux/amd64 image to GHCR on every push to `main`
+through `.github/workflows/publish-image.yml`. After the first successful run,
+make the `ghcr.io/santleme/mako` package public so Plow can pull it
+anonymously. The workflow's immutable commit tag can then be resolved to a
+digest and requested with the official CLI:
+
+```sh
+plow-agents image build ghcr.io/santleme/mako:<tag>
+plow-agents image push ghcr.io/santleme/mako:<tag>
+plow-agents deploy ghcr.io/santleme/mako@sha256:<digest> --line <free-line-uid>
+plow-agents agents
+```
+
+Wait for `running` before texting the deployed line. The Agent Index's hosted
+“Text this agent” button is separate: the Index maintainers must enable the
+agent's `deployable_at` flag after reviewing the public image and repository.
 
 ### Agent Index install flow and verification
 
