@@ -64,8 +64,8 @@ recreated install.
 
 ## Agent Index registration and checks
 
-The image fetches exactly the pinned client in `vendor/client.pin` and verifies
-its SHA-256 during the image build. From this directory, use the persistent-
+The Agent Index client and reporter come with the Plow base image; this repo
+ships no copy. From this directory, use the persistent-
 volume registration path:
 
 ```sh
@@ -120,10 +120,11 @@ docker compose logs -f agent
 
 Look for `plow-init: configured ... as cht_...` before sending the first SMS.
 Verify the local runtime with `docker compose ps`, then verify the Agent Index
-registration from this checkout:
+registration:
 
 ```sh
-python3 agent_index_client.py status
+docker compose exec -T agent /opt/hermes/.venv/bin/python3 \
+  /opt/plow/agent-index-client.py status
 ```
 
 The command must exit `0`. The public record is
@@ -136,8 +137,7 @@ The `--user 10000:10000` registration is important: it makes the persistent
 Agent Index state readable and writable by the s6 reporter, while the normal
 container still starts as the base image's root `/init` process.
 
-The runtime reporter is the official s6 longrun under
-`image/s6-overlay/s6-rc.d/agent-index`. It registers only when the client says
+The runtime reporter is the base image's own `agent-index` s6 longrun. It registers only when the client says
 the persistent install state is absent, gives the Plow bearer only to that
 registration exchange, and reports every five minutes without the bearer.
 
